@@ -1,0 +1,157 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1a2a"><title>Brutal Seas — Bering Sea Crab Demo</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:#06111c;color:#eaf3ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
+#cv{position:fixed;inset:0;width:100%;height:100%;display:block}
+.scr{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;padding:18px 14px 70px;background-size:cover;background-position:center}
+.scr.on{display:flex}
+.shade{position:absolute;inset:0;background:linear-gradient(#06111ccc,#06111cf0);z-index:-1}
+h1{font-size:42px;margin:30px 0 4px;letter-spacing:2px;text-shadow:0 3px 0 #000,0 0 20px #3af;text-align:center}
+h2{margin:6px 0 10px;text-align:center}
+.sub{opacity:.85;text-align:center;max-width:420px}
+.btn{border:0;border-radius:14px;padding:14px 20px;margin:6px;font-weight:800;font-size:17px;color:#fff;background:linear-gradient(#ff8a2a,#d4501a);box-shadow:0 5px 0 #7a2a08,0 8px 18px #0008;transition:transform .08s,box-shadow .08s;cursor:pointer;min-width:120px}
+.btn:active,.btn.press{transform:translateY(4px) scale(.96);box-shadow:0 1px 0 #7a2a08}
+.btn.blue{background:linear-gradient(#3aa0ff,#1a5fc4);box-shadow:0 5px 0 #0b3270,0 8px 18px #0008}
+.btn.green{background:linear-gradient(#3ed27a,#1b8f48);box-shadow:0 5px 0 #0c4a22,0 8px 18px #0008}
+.btn.gray{background:linear-gradient(#6b7a8c,#3e4a59);box-shadow:0 5px 0 #222b35}
+.btn:disabled{filter:grayscale(1) brightness(.6)}
+.card{background:#0d2236e8;border:1px solid #2c5a85;border-radius:16px;padding:14px;margin:8px 0;width:100%;max-width:440px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.money{font-size:22px;font-weight:900;color:#ffd34d}
+table{width:100%;border-collapse:collapse}td{padding:5px 2px;border-bottom:1px solid #1d3b58}
+.up{color:#49e07c}.dn{color:#ff5a5a}
+#hud{position:fixed;left:0;right:0;top:0;display:none;padding:8px;pointer-events:none;font-size:13px}
+#hud .g{display:flex;gap:6px;flex-wrap:wrap}
+.gauge{background:#000a;border-radius:8px;padding:4px 7px;min-width:72px}
+.bar{height:6px;background:#333;border-radius:4px;overflow:hidden;margin-top:2px}.bar i{display:block;height:100%}
+#ctl{position:fixed;left:0;right:0;bottom:30px;display:none;justify-content:center;flex-wrap:wrap;padding:0 6px}
+#ctl .btn{min-width:0;padding:12px 12px;font-size:15px;margin:4px}
+#banner{position:fixed;top:32%;left:0;right:0;text-align:center;font-size:38px;font-weight:900;display:none;text-shadow:0 4px 0 #000,0 0 30px #f00;pointer-events:none}
+#haul{position:fixed;left:5%;right:5%;top:40%;display:none;background:#000c;border-radius:16px;padding:14px;text-align:center}
+#hbar{position:relative;height:34px;background:#333;border-radius:10px;overflow:hidden;margin:10px 0}
+#hzone{position:absolute;top:0;bottom:0;background:#2ecc71}#hperf{position:absolute;top:0;bottom:0;background:#ffe14d}
+#hmk{position:absolute;top:-4px;bottom:-4px;width:6px;background:#fff;box-shadow:0 0 8px #fff}
+#toast{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:#000c;padding:8px 14px;border-radius:12px;display:none;font-weight:700;text-align:center;z-index:9}
+footer{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:11px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:#000a;z-index:20}
+footer a{color:#9fd1ff}
+.boatpick{display:flex;gap:10px;align-items:center}
+.boatpick canvas{background:#123;border-radius:10px}
+.spark{vertical-align:middle}
+
+body{font-family:"Arial Narrow","Roboto Condensed",system-ui,sans-serif}
+h1,h2{font-family:Impact,"Arial Narrow",sans-serif;letter-spacing:2px;text-shadow:0 2px 0 #000,0 0 18px rgba(242,182,50,.25)}
+.gold,.money{color:#f2b632}
+.btn{background:linear-gradient(#2c2a26,#121110);border:1px solid #7a6330;color:#f3d27a;box-shadow:0 4px 0 #000,0 6px 16px #000a;text-transform:uppercase;letter-spacing:1px}
+.btn.green{background:linear-gradient(#26332a,#0e1510);border-color:#5f8a4a;color:#c9f0a8;box-shadow:0 4px 0 #000}
+.btn.blue{background:linear-gradient(#22303a,#0c1318);border-color:#4a6f8a;color:#bfe3ff;box-shadow:0 4px 0 #000}
+.btn.gray{background:linear-gradient(#2a2a2a,#111);border-color:#555;color:#ddd;box-shadow:0 4px 0 #000}
+.btn:active{box-shadow:0 0 0 #000,0 0 14px rgba(242,182,50,.6)}
+.card,.gauge,#haul,#fight,#toast{background:rgba(8,10,12,.84)!important;border:1px solid #3a3530;box-shadow:inset 0 0 20px #000}
+.shade{background:radial-gradient(ellipse at center,rgba(4,8,10,.55),rgba(0,0,0,.92))}
+#gF,#gH,#gI{filter:saturate(.8)}
+
+#cv,#ctl .btn,#joy,#route .btn,#hStop,#bReel,#bCorrect{touch-action:none}
+.scr{touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;height:100vh;height:100dvh;padding-bottom:calc(90px + env(safe-area-inset-bottom))!important}
+#ctl{position:fixed;left:0;right:0;bottom:calc(40px + env(safe-area-inset-bottom));display:none;justify-content:space-between;align-items:flex-end;padding:0 8px;gap:8px;pointer-events:none}
+#ctl>div{pointer-events:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+#rz{justify-content:flex-end;max-width:58%}
+.btn.big{min-height:64px;min-width:64px;font-size:15px;padding:10px 14px;margin:0;border-radius:16px}
+.btn.sq{width:72px;height:72px;font-size:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.btn.sq small{font-size:10px}
+#bSurf{min-height:76px;min-width:150px;font-size:20px;background:linear-gradient(#3c6a2c,#16300f)!important;border:2px solid #9fe07a;color:#eaffd8}
+#joy{width:132px;height:132px;border-radius:50%;background:radial-gradient(#1d2a30cc,#05090bdd);border:2px solid #7a6330;position:relative;display:none;text-align:center}
+#joy small{position:absolute;top:6px;left:0;right:0;font-size:10px;color:#f3d27a}
+#knob{position:absolute;left:41px;top:41px;width:50px;height:50px;border-radius:50%;background:radial-gradient(#f3d27a,#8a6a20);box-shadow:0 0 12px #000}
+#route{position:fixed;left:8px;right:8px;display:none;top:150px;background:rgba(8,10,12,.84);border:1px solid #3a3530;border-radius:14px;padding:8px}
+#rmap{position:relative;height:30px;background:linear-gradient(90deg,#1c2a1c,#0b1a26 15%,#06121c);border-radius:8px;overflow:hidden}
+#rmap .pin{z-index:1;position:absolute;top:3px;font-size:16px;transform:translateX(-50%)}
+#rline{position:absolute;left:0;right:0;top:50%;border-top:1px dashed #456}
+#route .btn{flex:1;font-size:14px}
+#hud{font-size:12px}#hud .gauge{min-width:60px;padding:3px 6px}
+#toast{top:auto!important;bottom:250px;pointer-events:none}#banner{pointer-events:none}
+@media (orientation:landscape){#route{left:auto;right:8px;width:44%;bottom:auto;top:8px}#sonar{max-width:52%!important}#hud .g{max-width:52%}#toast{bottom:120px}}
+
+#hud{padding:0!important;font-size:11px!important}
+#hbar{display:flex;gap:7px;align-items:center;white-space:nowrap;overflow:hidden;background:rgba(4,6,8,.55);padding:4px 46px 4px 8px;padding-top:calc(4px + env(safe-area-inset-top));backdrop-filter:blur(3px);font-size:11px}
+#hbar b{font-weight:700}.mg{display:inline-flex;align-items:center;gap:2px}.mb{display:inline-block;width:26px;height:4px;background:#333;border-radius:2px;overflow:hidden}.mb i{display:block;height:100%}
+#sonar{background:transparent!important;border:0!important;box-shadow:none!important;padding:1px 8px!important;max-width:none!important;width:100%!important;margin:0!important;font-size:10px;opacity:.85}
+#sonar span[style]{height:5px!important}
+.sub #sonar{background:rgba(4,6,8,.55)!important;font-size:11px}
+.ib{width:44px;height:44px;border-radius:12px;border:1px solid #6b5a2a;background:rgba(10,10,10,.6);color:#f3d27a;font-size:18px;padding:0;touch-action:none}
+.ib.on{background:rgba(40,80,30,.8);border-color:#9fe07a}
+#bEye{position:fixed;top:calc(2px + env(safe-area-inset-top));right:4px;z-index:22;display:none;width:38px;height:30px;font-size:15px}
+#corner{position:fixed;left:6px;top:calc(48px + env(safe-area-inset-top));display:none;gap:4px;align-items:center;z-index:12}
+#corner #spdV{color:#f2b632;font-size:13px;min-width:26px;text-align:center}
+#route{top:calc(48px + env(safe-area-inset-top))!important;left:auto!important;right:6px!important;width:auto!important;max-width:60%;bottom:auto!important;padding:6px 10px!important;background:rgba(4,6,8,.6)!important;font-size:12px;border-radius:22px!important;cursor:pointer}
+#route #rbody{display:none}#route.open{width:min(92vw,420px)!important;max-width:none;border-radius:14px!important}#route.open #rbody{display:block}#route.open #rsum{margin-bottom:4px}
+#ctl{flex-wrap:nowrap!important;bottom:calc(30px + env(safe-area-inset-bottom))!important}#ctl>div{flex-wrap:nowrap!important}#rz{max-width:none!important}
+#ctl .btn.big{min-height:60px;font-size:13px;padding:6px 10px}#ctl .btn.sq{width:60px;height:60px}
+#bSurf{min-width:120px!important;min-height:64px!important;font-size:16px!important}
+#toast{bottom:calc(110px + env(safe-area-inset-bottom))!important;font-size:13px;padding:6px 12px;max-width:80vw}
+body.nohud #hud,body.nohud #corner,body.nohud #route{visibility:hidden}
+@media (orientation:landscape){#route{max-width:40%}#corner{top:calc(40px + env(safe-area-inset-top))}}
+.insub #sonar{margin-top:48px!important}
+.insub #toast{top:26%!important;bottom:auto!important}
+.insub #ctl .btn.big{min-width:0!important;flex:1 1 0;padding-left:4px;padding-right:4px;font-size:15px}
+@media (orientation:landscape){#boss{top:13%!important;padding:6px 10px!important;left:22%!important;right:22%!important}#boss small{display:none}#boss .btn.big{min-height:44px;padding:4px}}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div id="hud"><div id="hbar">
+ <span id="hM" class="gold"></span>
+ <span class="mg">⛽<span class="mb"><i id="gF" style="background:#ffb02e"></i></span></span>
+ <span class="mg">🛠<span class="mb"><i id="gH" style="background:#4ce07c"></i></span></span>
+ <span class="mg">🧊<span class="mb"><i id="gI" style="background:#9fe8ff"></i></span></span>
+ <span><span id="gCi">🦀</span><b id="gC">0</b></span><span>🪤<b id="gP">0</b></span>
+ <span id="gW"></span><span id="gT"></span>
+</div><div id="sonar"></div></div>
+<button id="bEye" class="ib">👁</button>
+<div id="corner"><button class="ib" id="bAuto">🤖</button><button class="ib" id="spdM">−</button><b id="spdV">1×</b><button class="ib" id="spdP">+</button></div>
+<div id="route"><div id="rsum">⛵ …</div><div id="rbody"><div id="rmap"><div id="rline"></div></div><div class="row" style="gap:6px;margin-top:6px"><button class="btn green big" id="bGo">⛵ HOTSPOT</button><button class="btn gray big" id="bPort">⚓ PORT</button></div></div></div>
+<div id="ctl"><div id="lz"><button class="btn blue big sq" id="bL">◀<small>BACK</small></button><button class="btn blue big sq" id="bR">▶<small>AHEAD</small></button>
+ <div id="joy"><div id="knob"></div><small>MOVE SUB</small></div></div>
+ <div id="rz"><button class="btn big" id="bDrop">DROP POT</button><button class="btn green big" id="bHaul">HAUL</button><button class="btn blue big" id="bIce">🧊 BREAK ICE</button><button class="btn blue big" id="bSkip" style="display:none">⏩ SLEEP TILL DAWN</button><button class="btn big" id="bSub">🟡 LAUNCH SUB</button><button class="btn blue big" id="bHarp" style="display:none">🎯 HARPOON</button><button class="btn blue big" id="bDrone" style="display:none">🛸 DRONE</button><button class="btn blue big" id="bStun" style="display:none">⚡ STUN</button><button class="btn green big" id="bSurf">⬆ SURFACE</button><button class="btn blue" id="bUp" style="display:none">▲</button><button class="btn blue" id="bDn" style="display:none">▼</button><button class="btn gray" id="bHome" style="display:none">PORT</button></div></div>
+<div id="banner"></div><div id="warn" style="display:none;position:fixed;left:8px;right:8px;top:42%;z-index:15;background:rgba(40,8,8,.92);border:2px solid #f84;border-radius:14px;padding:12px;text-align:center"><div id="warnTxt" style="font-size:16px"></div><div class="bar" style="height:8px;margin:8px 0"><i id="warnT" style="background:#f84;width:100%"></i></div><button class="btn green big" id="bCorrect" style="width:80%">✋ CORRECT</button></div>
+<div id="haul"><b>HAUL POT — tap STOP in the green!</b><div id="hbar"><div id="hzone"></div><div id="hperf"></div><div id="hmk"></div></div><button class="btn green" id="hStop">STOP</button></div>
+<div id="fight" style="position:fixed;left:5%;right:5%;top:36%;display:none;background:#000c;border-radius:16px;padding:14px;text-align:center"><b id="fName"></b>
+<div style="text-align:left;font-size:12px;margin-top:8px">Line tension (don't hit red!)</div><div class="bar" style="height:16px"><i id="tBar"></i></div>
+<div style="text-align:left;font-size:12px;margin-top:6px">Fish distance</div><div class="bar" style="height:10px"><i id="dBar" style="background:#3af"></i></div>
+<button class="btn green" id="bReel" style="margin-top:10px;width:80%">HOLD TO REEL</button></div><div id="boss" style="position:fixed;left:4%;right:4%;top:22%;display:none;z-index:20;background:#1a0606e8;border:2px solid #d33;border-radius:16px;padding:12px;text-align:center"><b id="bsN" style="font-size:18px;color:#ff6b5b"></b><div><small id="bsD"></small></div><div style="height:14px;background:#333;border-radius:7px;margin:8px 0;overflow:hidden"><i id="bsHp" style="display:block;height:100%;width:100%;background:linear-gradient(90deg,#f33,#fb2)"></i></div><div id="bsP" style="margin-bottom:8px"></div><div style="display:flex;gap:8px"><button class="btn green big" id="bsA" style="flex:2">ATTACK</button><button class="btn big" id="bsB" style="flex:1">🛡 BRACE</button></div><small>Tap attack fast · hit BRACE when it flashes red</small></div>
+<div class="scr" id="sLog"><div class="shade"></div><div class="card" style="max-height:80dvh;overflow:auto"><h2>📖 Logbook</h2><div id="lbBody"></div><button class="btn gray big" id="bLogBack">⚓ Back to dock</button></div></div><div id="dlg" style="display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div class="card" style="max-width:420px;text-align:center"><div id="dlgT" style="margin-bottom:12px;line-height:1.4"></div><button class="btn green big" id="dlgOk">OK</button><button class="btn gray big" id="dlgNo">Cancel</button></div></div><div id="toast"></div>
+
+<div class="scr on" id="sStart" style="background-image:url(img/storm.jpg)"><div class="shade"></div>
+ <h1>BRUTAL SEAS</h1><div class="sub">Bering Sea King Crab · Demo<br>Start with a rusty skiff. Survive the storms. Build a crab empire.</div>
+ <div style="height:30px"></div>
+ <button class="btn" id="bPlay">▶ PLAY</button><button class="btn green" id="bDemo">⭐ Try Dyscovery1 Demo</button>
+ <button class="btn gray" id="bReset" style="font-size:13px">Reset save</button>
+ <div class="card sub" style="font-size:13px">◀ ▶ steer · DROP POT on hotspots (sonar) · wait for soak · HAUL with timing · tap ICE (or the boat) to break ice · when a rogue wave hits, TURN INTO IT!</div>
+</div>
+
+<div class="scr" id="sBoats" style="background-image:url(img/boats.jpg)"><div class="shade"></div>
+ <h2>Pick your boat</h2><div class="money" id="mB"></div><div id="boatList" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>
+ <button class="btn gray" id="bBoatBack">Back</button>
+</div>
+
+<div class="scr" id="sDock" style="background-image:url(img/dock.jpg)"><div class="shade"></div>
+ <h2>⚓ Kodiak Dock</h2><div class="money" id="mD"></div><div class="sub" id="dockInfo"></div>
+ <div class="card" id="orders"></div>
+ <div class="card"><b>🌦 WEATHER FORECAST</b><table id="fc"></table><small style="opacity:.7">Bigger storms = more risk, but higher crab prices.</small></div>
+ <div class="card"><div class="row"><b>📈 TODAY'S PRICES</b><small id="mDate"></small></div>
+  <table id="mkt"></table><small style="opacity:.7">Ex-vessel $/lb. Prices change daily for everyone, "soon" species unlock with new grounds. Prices rise with storms & low supply, dip when you flood the dock.</small></div>
+ <div class="sub" style="margin-top:6px">⛵ SET SAIL TO:</div><div id="grounds" style="display:flex;flex-wrap:wrap;justify-content:center"></div>
+ <div><button class="btn" id="bCo">🏢 COMPANY</button><button class="btn blue" id="bYard">🔧 SHIPYARD</button><button class="btn gray" id="bLog">📖 LOGBOOK</button><button class="btn blue" id="bBoats2">🚢 BOATS</button></div>
+</div>
+
+<div class="scr" id="sYard" style="background-image:url(img/shipyard.jpg)"><div class="shade"></div>
+ <h2>🔧 Shipyard</h2><div class="money" id="mY"></div><div id="yard" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>
+ <button class="btn gray" id="bYardBack">Back to dock</button>
+</div>
+
+<div class="scr" id="sCo" style="background-image:url(img/dock.jpg)"><div class="shade"></div><h2>🏢 Company Dashboard</h2><div class="card" id="coHead"></div><div id="coFleet" style="width:100%;display:flex;flex-direction:column;align-items:center"></div><button class="btn gray" id="bCoBack">Back to dock</button><button class="btn gray" id="bReset2" style="font-size:12px">Reset save</button></div>
+<div class="scr" id="sSum" style="background-image:url(img/dock.jpg)"><div class="shade"></div>
+ <h2 id="sumT">Trip Summary</h2><div class="card"><table id="sumTab"></table></div>
+ <button class="btn green" id="bSumOk">Continue</button>
+</div>
+<footer><span id="volbox"><button id="bMute" style="background:none;border:0;font-size:15px;color:#f3d27a;min-width:36px">🔊</button><input id="vol" type="range" min="0" max="1" step="0.05" style="width:80px;vertical-align:middle;touch-action:auto"></span> · <a href="https://leafactivity.com" target="_blank">leafactivity.com</a> · <a href="mailto:Leafactivity@gmail.com">Leafactivity@gmail.com</a></footer>
+<script src="game.js?v=s1791864483"></script></body></html>
